@@ -8,6 +8,7 @@
 
 #include "CuTest.h"
 
+
 typedef struct node {
     int64_t val;
     struct node *next;
@@ -21,12 +22,27 @@ node_t *free_list = NULL; // global variable for free list
 
 // TODO: return node at head of free list, allocate NUM_ALLOC more nodes using malloc if free list empty
 node_t *get_node() {
-    return NULL;
+    if (free_list == NULL) {
+        free_list = (node_t *) malloc(sizeof(node_t) * NUM_ALLOC);
+        if (free_list == NULL) {
+            printf("Error allocating nodes!\n");
+            exit(1);
+        }
+        for (int i = 0; i < NUM_ALLOC; i++) {
+            free_list[i].next = &free_list[i+1];
+        }
+        free_list[NUM_ALLOC-1].next = NULL;
+    }
+    node_t *ptr = free_list;
+    free_list = free_list->next;
+    return ptr;
 }
 
 // TODO: insert freed nodes at head of free list
 void free_node (node_t *ptr) {
-    return;
+    if(ptr == NULL) return;
+    ptr->next = free_list;
+    free_list = ptr;
 }
 
 // utility functions
